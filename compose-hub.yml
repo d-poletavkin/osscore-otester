@@ -20,8 +20,13 @@ services:
   server:
     container_name: otester_server
     # местонахождение Dockerfile
-    image: osscore/otester-client
-    env_file: ./server/.env
+    image: osscore/otester-server
+    environment:
+      DB_NAME='otester'
+      DB_USER='postgres'
+      DB_PASSWORD='1234'
+      DB_HOST='db'
+      DB_PORT='5432'
     command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:5000"
     ports:
       - 5000:5000
@@ -42,8 +47,13 @@ services:
   celery:
       container_name: otester_celery
       restart: always
-      image: osscore/otester-client
-      env_file: ./server/.env
+      image: osscore/otester-server
+      environment:
+        DB_NAME='otester'
+        DB_USER='postgres'
+        DB_PASSWORD='1234'
+        DB_HOST='db'
+        DB_PORT='5432'
       command: celery -A server.celery worker --loglevel=INFO --pool=solo
       networks:
         - net
