@@ -46,8 +46,7 @@ services:
   celery:
       container_name: otester_celery
       restart: always
-      image: osscore/otester-server:1.1
-      restart: always
+      image: osscore/otester-server
       environment:
         - DB_NAME=otester
         - DB_USER=postgres
