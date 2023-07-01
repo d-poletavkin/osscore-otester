@@ -6,7 +6,7 @@ networks:
 services:
   client:
     container_name: otester_client
-    image: osscore/otester-client:1.1
+    image: osscore/otester-client
     command: bash -c "ng serve --host 0.0.0.0"
     depends_on:
       - server
@@ -20,7 +20,7 @@ services:
   server:
     container_name: otester_server
     # местонахождение Dockerfile
-    image: osscore/otester-server:1.1
+    image: osscore/otester-server
     restart: always
     environment:
       - DB_NAME=otester
