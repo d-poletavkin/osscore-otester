@@ -7,7 +7,6 @@ services:
   client:
     container_name: otester_client
     image: osscore/otester-client
-    command: bash -c "ng serve --host 0.0.0.0"
     depends_on:
       - server
     ports:
@@ -28,7 +27,7 @@ services:
       - DB_PASSWORD=1234
       - DB_HOST=db
       - DB_PORT=5432
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:5000"
+    command: bash -c "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin && python manage.py migrate && python manage.py runserver 0.0.0.0:5000"
     ports:
       - 5000:5000
     networks:
@@ -53,7 +52,7 @@ services:
         - DB_PASSWORD=1234
         - DB_HOST=db
         - DB_PORT=5432
-      command: celery -A server.celery worker --loglevel=INFO --pool=solo
+      command: bash -c "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin && celery -A server.celery worker --loglevel=INFO --pool=solo" 
       networks:
         - net
       depends_on:
@@ -69,5 +68,10 @@ services:
         - POSTGRES_DB=otester
       networks:
         - net
+      volumes:
+        - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
 
       
