@@ -2,9 +2,10 @@
 # то есть внутри контейнера адрес директории uploads будет /app/uploads (app - это рабочая директорая, указанная в Dockerfile командой WORKDIR)
 networks:
   net:
-   
+
 services:
   client:
+    restart: always
     container_name: otester_client
     image: osscore/otester-client
     depends_on:
@@ -15,12 +16,12 @@ services:
       - net
     volumes:
       - ./client/node_modules:/node_modules
-   
+
   server:
+    restart: always
     container_name: otester_server
     # местонахождение Dockerfile
     image: osscore/otester-server
-    restart: always
     environment:
       - DB_NAME=otester
       - DB_USER=postgres
@@ -35,43 +36,43 @@ services:
     depends_on:
       - db
     volumes:
-        - ./server/uploads:/app/uploads
+      - ./server/uploads:/app/uploads
 
   redis:
-      container_name: otester_redis
-      image: redis:7.0.7
-      networks:
-        - net 
+    restart: always
+    container_name: otester_redis
+    image: redis:7.0.7
+    networks:
+      - net
   celery:
-      container_name: otester_celery
-      restart: always
-      image: osscore/otester-server
-      environment:
-        - DB_NAME=otester
-        - DB_USER=postgres
-        - DB_PASSWORD=1234
-        - DB_HOST=db
-        - DB_PORT=5432
-      command: bash -c "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin v0.63.1 && celery -A server.celery worker --loglevel=INFO --pool=solo" 
-      networks:
-        - net
-      depends_on:
-        - redis
-        - server
-      volumes:
-        - ./server/uploads:/app/uploads
+    restart: always
+    container_name: otester_celery
+    image: osscore/otester-server
+    environment:
+      - DB_NAME=otester
+      - DB_USER=postgres
+      - DB_PASSWORD=1234
+      - DB_HOST=db
+      - DB_PORT=5432
+    command: bash -c "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin v0.63.1 && celery -A server.celery worker --loglevel=INFO --pool=solo"
+    networks:
+      - net
+    depends_on:
+      - redis
+      - server
+    volumes:
+      - ./server/uploads:/app/uploads
   db:
-      container_name: otester_db
-      image: postgres:15
-      environment:
-        - POSTGRES_PASSWORD=1234
-        - POSTGRES_DB=otester
-      networks:
-        - net
-      volumes:
-        - pg_data:/var/lib/postgresql/data
+    restart: always
+    container_name: otester_db
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=otester
+    networks:
+      - net
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
 volumes:
   pg_data:
-
-      
